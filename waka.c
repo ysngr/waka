@@ -2,10 +2,29 @@
 
 #include "waka.h"
 
+const char hslist[MAX_HS][MAX_CHARNUM] = {
+    {"あ"}, {"い"}, {"う"}, {"え"}, {"お"},  // 01 ~ 05
+    {"か"}, {"き"}, {"く"}, {"け"}, {"こ"},  // 06 ~ 10
+    {"さ"}, {"し"}, {"す"}, {"せ"}, {"そ"},  // 11 ~ 15
+    {"た"}, {"ち"}, {"つ"}, {"て"}, {"と"},  // 16 ~ 20
+    {"な"}, {"に"}, {"ぬ"}, {"ね"}, {"の"},  // 21 ~ 25
+    {"は"}, {"ひ"}, {"ふ"}, {"へ"}, {"ほ"},  // 26 ~ 30
+    {"ま"}, {"み"}, {"む"}, {"め"}, {"も"},  // 31 ~ 35
+    {"や"}, {"ゆ"}, {"よ"},  // 36 ~ 38
+    {"ら"}, {"り"}, {"る"}, {"れ"}, {"ろ"},  // 39 ~ 43
+    {"わ"}, {"ゐ"}, {"ゑ"}, {"を"}, {"ん"},  // 44 ~ 48
+    {"が"}, {"ぎ"}, {"ぐ"}, {"げ"}, {"ご"},  // 49 ~ 53
+    {"ざ"}, {"じ"}, {"ず"}, {"ぜ"}, {"ぞ"},  // 54 ~ 58
+    {"だ"}, {"ぢ"}, {"づ"}, {"で"}, {"ど"},  // 59 ~ 63
+    {"ば"}, {"び"}, {"ぶ"}, {"べ"}, {"ぼ"},  // 64 ~ 68
+    {"　"}, {"ｘ"}  // 69 ~ 70
+};
+
+
 int max_waka;
 int wakalist[MAX_WAKA][MAX_WORD];
 
-int dupl, rand_ord, constant;
+int dupl, rand_ord, constant, open_index;
 int quiz_num, ku_num, word_num;
 char filename[MAX_BUF_SIZE];
 
@@ -31,6 +50,7 @@ void init_option(void)
     dupl = DEFAULT_DUPLICATION;
     rand_ord = DEFAULT_RANDOM_ORDER;
     constant = DEFAULT_CONSTANT;
+    open_index = DEFAULT_OPEN_INDEX;
     quiz_num = DEFAULT_QUIZ_NUM;
     ku_num = DEFAULT_KU_NUM;
     word_num = DEFAULT_WORD_NUM;
@@ -45,7 +65,7 @@ void parse_option(int argc, char *argv[])
     int opt;
 
     opterr = 0;
-    while( (opt = getopt(argc, argv, "cdf:hk:n:prw:")) != -1 ){
+    while( (opt = getopt(argc, argv, "cdf:hik:n:prw:")) != -1 ){
         switch( opt ){
             case 'c' :
                 constant = True;
@@ -55,6 +75,9 @@ void parse_option(int argc, char *argv[])
                 break;
             case 'f' :
                 strncpy(filename, optarg, MAX_BUF_SIZE);
+                break;
+            case 'i' :
+                open_index = True;
                 break;
             case 'k' :
                 ku_num = atoi(optarg);
@@ -87,7 +110,7 @@ void parse_option(int argc, char *argv[])
             case 'h' :
             case '?' :
             default :
-                fprintf(stderr, "Usage : %s [-d] [-f filename] [-k ku_num [-c] | -w word_num | -p] [-h] [-n quiz_num] [-r]\n", argv[0]);
+                fprintf(stderr, "Usage : %s [-d] [-f filename] [-k ku_num [-c] | -w word_num | -p] [-h] [-i] [-n quiz_num] [-r]\n", argv[0]);
                 exit(EXIT_FAILURE);
         }
     }

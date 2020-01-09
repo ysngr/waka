@@ -1,15 +1,13 @@
 /* setup.c */
 
-#include "waka.h"
-
-int moji_state;
+#include"waka.h"
 
 
 void init(void)
 {
     FILE *fp;
 
-    if( (fp = fopen(filename, "r")) == NULL ){
+    if( (fp = fopen(filename,"r")) == NULL ){
         printf("File cannot open.\n");
         exit(EXIT_FAILURE);
     }
@@ -41,7 +39,7 @@ void scan_wakas(FILE *fp)
 
     idx = 0;
     while( fgets(wakabuf, MAX_BUF_SIZE, fp) != NULL ){
-        if( waka_to_nums(idx, wakabuf) ){
+        if( wtons(idx, wakabuf) ){
             idx++;
         }
     }
@@ -55,41 +53,21 @@ void scan_wakas(FILE *fp)
 }
 
 
-int is_valid_char(char c)
+int wtons(int idx, char *waka)
 {
-    if( isalpha(c) || c == ' ' ){
-        return True;
-    }
-
-    return False;
-}
-
-
-int waka_to_nums(int idx, char *waka)
-{
-    int i, cn_idx;
-    int n;
+    int i, d, cn_idx;
     int charnum[MAX_WORD];
 
     // initialize
     if( waka[strlen(waka)-1] == '\n' ){
         waka[strlen(waka)-1] = '\0';  // kill newline
     }
-    set_aryelem_int(charnum, MAX_WORD, 0);
-    moji_state = CONSONANT;
-    cn_idx = 0;
 
     // translate
-    for( i = 0; waka[i] != '\0'; i++ ){
-        if( is_valid_char(waka[i]) == False ){
+    for( i = 0, cn_idx = 0; waka[i] != '\0'; i += d ){
+        // todo commentout
+        if( (d = hton(&(waka[i]), &(charnum[cn_idx++]))) == False ){
             return False;
-        }
-        if( (n = parse_hton(waka[i])) == False ){
-            return False;
-        }
-        charnum[cn_idx] += n;
-        if( moji_state ==  CONSONANT ){
-            cn_idx++;
         }
     }
 
@@ -102,39 +80,16 @@ int waka_to_nums(int idx, char *waka)
 }
 
 
-int parse_hton(char c)
+int hton(char *hs, int *res)
 {
-    if( moji_state == CONSONANT ){
-        switch ( c ) {
-            case 'a' : return A;
-            case 'i' : return I;
-            case 'u' : return U;
-            case 'e' : return E;
-            case 'o' : return O;
-            case 'k' : moji_state = VOWEL; return Ks;
-            case 's' : moji_state = VOWEL; return Ss;
-            case 't' : moji_state = VOWEL; return Ts;
-            case 'n' : moji_state = VOWEL; return Ns;
-            case 'h' : moji_state = VOWEL; return Hs;
-            case 'm' : moji_state = VOWEL; return Ms;
-            case 'y' : moji_state = VOWEL; return Ys;
-            case 'r' : moji_state = VOWEL; return Rs;
-            case 'w' : moji_state = VOWEL; return Ws;
-            case 'g' : moji_state = VOWEL; return Gs;
-            case 'z' :
-            case 'j' : moji_state = VOWEL; return Zs;
-            case 'd' : moji_state = VOWEL; return Ds;
-            case 'b' : moji_state = VOWEL; return Bs;
-            case ' ' : return BLANK;
-        }
-    }else if( moji_state == VOWEL ){
-        switch( c ){
-            case 'a' : moji_state = CONSONANT; return 1;
-            case 'i' : moji_state = CONSONANT; return 2;
-            case 'u' : moji_state = CONSONANT; return 3;
-            case 'e' : moji_state = CONSONANT; return 4;
-            case 'o' : moji_state = CONSONANT; return 5;
-            case 'n' : moji_state = CONSONANT; return 6;
+    int i;
+    int len;
+
+    for( i = 0; i < MAX_HS; i++ ){
+        len = strlen(hslist[i]);
+        if( strncmp(hs, hslist[i], len) == 0 ){
+            *res = i + 1;
+            return len;
         }
     }
 
