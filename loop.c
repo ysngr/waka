@@ -53,6 +53,12 @@ void show_options(void)
     printf(" === Quiz start === \n");
     printf("[options]\n");
     printf("File = %s\n", filename);
+    printf("Index : ");
+    if( open_index == True ){
+        printf("open\n");
+    }else{
+        printf("close\n");
+    }
     printf("Open ");
     if( ku_num + word_num == 0 ){
         printf("all\n");
@@ -123,6 +129,11 @@ void show_nth_waka_mkus(int n, int *mkus)
 void show_nth_waka_mwords(int n, int *mwords)
 {
     int i;
+
+    if( open_index == True ){
+        printf("%3d : ", n+1);
+    }
+
     for( i = 0; wakalist[n][i] != 0; i++ ){
         if( mwords[i] == True ){
             show_ntoh(wakalist[n][i]);
@@ -138,6 +149,11 @@ void show_nth_waka_mwords(int n, int *mwords)
 void show_nth_waka(int n)
 {
     int i;
+
+    if( open_index == True ){
+        printf("%3d : ", n+1);
+    }
+
     for( i = 0; wakalist[n][i] != 0; i++ ){
         show_ntoh(wakalist[n][i]);
     }
@@ -149,78 +165,7 @@ void show_nth_waka(int n)
 
 void show_ntoh(int charnum)
 {
-    switch( charnum ){
-        case A : printf("あ"); break;
-        case I : printf("い"); break;
-        case U : printf("う"); break;
-        case E : printf("え"); break;
-        case O : printf("お"); break;
-        case KA : printf("か"); break;
-        case KI : printf("き"); break;
-        case KU : printf("く"); break;
-        case KE : printf("け"); break;
-        case KO : printf("こ"); break;
-        case SA : printf("さ"); break;
-        case SI : printf("し"); break;
-        case SU : printf("す"); break;
-        case SE : printf("せ"); break;
-        case SO : printf("そ"); break;
-        case TA : printf("た"); break;
-        case CHI : printf("ち"); break;
-        case TSU : printf("つ"); break;
-        case TE : printf("て"); break;
-        case TO : printf("と"); break;
-        case NA : printf("な"); break;
-        case NI : printf("に"); break;
-        case NU : printf("ぬ"); break;
-        case NE : printf("ね"); break;
-        case NO : printf("の"); break;
-        case HA : printf("は"); break;
-        case HI : printf("ひ"); break;
-        case HU : printf("ふ"); break;
-        case HE : printf("へ"); break;
-        case HO : printf("ほ"); break;
-        case MA : printf("ま"); break;
-        case MI : printf("み"); break;
-        case MU : printf("む"); break;
-        case ME : printf("め"); break;
-        case MO : printf("も"); break;
-        case YA : printf("や"); break;
-        case YU : printf("ゆ"); break;
-        case YO : printf("よ"); break;
-        case RA : printf("ら"); break;
-        case RI : printf("り"); break;
-        case RU : printf("る"); break;
-        case RE : printf("れ"); break;
-        case RO : printf("ろ"); break;
-        case WA : printf("わ"); break;
-        case WI : printf("ゐ"); break;
-        case WE : printf("ゑ"); break;
-        case WO : printf("を"); break;
-        case NN : printf("ん"); break;
-        case GA : printf("が"); break;
-        case GI : printf("ぎ"); break;
-        case GU : printf("ぐ"); break;
-        case GE : printf("げ"); break;
-        case GO : printf("ご"); break;
-        case ZA : printf("ざ"); break;
-        case ZI : printf("じ"); break;
-        case ZU : printf("ず"); break;
-        case ZE : printf("ぜ"); break;
-        case ZO : printf("ぞ"); break;
-        case DA : printf("だ"); break;
-        case DI : printf("ぢ"); break;
-        case DU : printf("づ"); break;
-        case DE : printf("で"); break;
-        case DO : printf("ど"); break;
-        case BA : printf("ば"); break;
-        case BI : printf("び"); break;
-        case BU : printf("ぶ"); break;
-        case BE : printf("べ"); break;
-        case BO : printf("ぼ"); break;
-        case BLANK : printf("　"); break;
-        case HIDDEN : printf("ｘ"); break;
-    }
+    printf("%s", hslist[charnum-1]);
 
     return ;
 }
