@@ -38,6 +38,9 @@ void show(void)
         }
         // show opened waka
         show_nth_waka(n);
+        if( ku_num + word_num != 0 ){ 
+            wait_for_newline();
+        }
     }
 
     // epilogue
@@ -52,35 +55,50 @@ void show_options(void)
 {
     printf(" === Quiz start === \n");
     printf("[options]\n");
+    // [f]
     printf("File = %s\n", filename);
+    // [i]
     printf("Index : ");
     if( open_index == True ){
         printf("open\n");
     }else{
         printf("close\n");
     }
+    // [k [c] | w | p | v]
     printf("Open ");
-    if( ku_num + word_num == 0 ){
+    if( ku_num + word_num == 0 ){  // [p]
         printf("all\n");
     }else{
         if( ku_num > 0 ){
-            printf("%d ku\n", ku_num);
-            printf("Opened place : ");
-            if( constant == True ){
-                printf("constant\n");
-            }else{
-                printf("unsettled\n");
+            // [v]
+            if( versus_mode == True ){
+                printf("first part\n");
             }
-        }else if( word_num > 0 ){
+            // [k]
+            else{
+                printf("%d ku\n", ku_num);
+                // [c]
+                printf("Opened place : ");
+                if( constant == True ){
+                    printf("constant\n");
+                }else{
+                    printf("unsettled\n");
+                }
+            }
+        }
+        // [w]
+        else if( word_num > 0 ){
             printf("%d word", word_num);
             if( word_num != 1 ){
                 printf("s");
             }
             printf("\n");
         }
+        // [r]
         printf("Order = ");
         if( rand_ord == True ){
             printf("random\n");
+            // [d]
             printf("Duplication = ");
             if( dupl == True ){
                 printf("True\n");
@@ -90,6 +108,7 @@ void show_options(void)
         }else{
             printf("numerical\n");
         }
+        // [n]
         printf("Quiz num = %d\n", quiz_num);
     }
 
@@ -221,8 +240,10 @@ void gen_idxs(int *ms, int max_idx, int num, int n)
 {
     int i, idx;
 
+    // initialize
     set_aryelem_int(ms, MAX_WORD, False);
     if( word_num > 0 ){
+        // set brank position opened
         for( i = 0; i < max_idx; i++ ){
             if( wakalist[n][i] == BLANK ){
                 ms[i] = True;
@@ -230,16 +251,22 @@ void gen_idxs(int *ms, int max_idx, int num, int n)
         }
     }
 
-    for( i = 0; i < num; i++ ){
-        // opend all character
-        if( is_cmpall_int(ms, max_idx, True) ){
-            break;
+    // select opened position
+    if( versus_mode == True ){
+        ms[0] = True;
+        ms[1] = True;
+    }else{
+        for( i = 0; i < num; i++ ){
+            // case : all position is opened
+            if( is_cmpall_int(ms, max_idx, True) ){
+                break;
+            }
+            // select
+            do{
+                idx = rand() % max_idx;
+            }while( ms[idx] == True );
+            ms[idx] = True;
         }
-        // select opened place
-        do{
-            idx = rand() % max_idx;
-        }while( ms[idx] == True );
-        ms[idx] = True;
     }
 
     return ;
