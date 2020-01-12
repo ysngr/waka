@@ -24,7 +24,7 @@ const char hslist[MAX_HS][MAX_CHARNUM] = {
 int max_waka;
 int wakalist[MAX_WAKA][MAX_WORD];
 
-int dupl, rand_ord, constant, open_index;
+int dupl, rand_ord, constant, open_index, versus_mode;
 int quiz_num, ku_num, word_num;
 char filename[MAX_BUF_SIZE];
 
@@ -51,6 +51,7 @@ void init_option(void)
     rand_ord = DEFAULT_RANDOM_ORDER;
     constant = DEFAULT_CONSTANT;
     open_index = DEFAULT_OPEN_INDEX;
+    versus_mode = DEFAULT_VERSUS_MODE;
     quiz_num = DEFAULT_QUIZ_NUM;
     ku_num = DEFAULT_KU_NUM;
     word_num = DEFAULT_WORD_NUM;
@@ -65,7 +66,7 @@ void parse_option(int argc, char *argv[])
     int opt;
 
     opterr = 0;
-    while( (opt = getopt(argc, argv, "cdf:hik:n:prw:")) != -1 ){
+    while( (opt = getopt(argc, argv, "cdf:hik:n:prvw:")) != -1 ){
         switch( opt ){
             case 'c' :
                 constant = True;
@@ -100,6 +101,11 @@ void parse_option(int argc, char *argv[])
             case 'r' :
                 rand_ord = True;
                 break;
+            case 'v' :
+                versus_mode = True;
+                ku_num = 2;
+                word_num = False;
+                break;
             case 'w' :
                 if( (word_num = atoi(optarg)) <= 0 ){
                     fprintf(stderr, "Invalid argument of option -w.\n");
@@ -110,7 +116,7 @@ void parse_option(int argc, char *argv[])
             case 'h' :
             case '?' :
             default :
-                fprintf(stderr, "Usage : %s [-d] [-f filename] [-k ku_num [-c] | -w word_num | -p] [-h] [-i] [-n quiz_num] [-r]\n", argv[0]);
+                fprintf(stderr, "Usage : %s [-d] [-f filename] [-k ku_num [-c] | -w word_num | -p | -v] [-h] [-i] [-n quiz_num] [-r]\n", argv[0]);
                 exit(EXIT_FAILURE);
         }
     }
