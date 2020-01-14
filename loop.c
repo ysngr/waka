@@ -38,7 +38,7 @@ void show(void)
         }
         // show opened waka
         show_nth_waka(n);
-        if( ku_num + word_num != 0 ){ 
+        if( ku_num + word_num != 0 && i != quiz_num-1 ){
             wait_for_newline();
         }
     }
@@ -253,8 +253,9 @@ void gen_idxs(int *ms, int max_idx, int num, int n)
 
     // select opened position
     if( versus_mode == True ){
-        ms[0] = True;
-        ms[1] = True;
+        for( i = 0; i <= 2; i++ ){
+            ms[i] = True;
+        }
     }else{
         for( i = 0; i < num; i++ ){
             // case : all position is opened

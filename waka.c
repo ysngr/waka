@@ -103,7 +103,7 @@ void parse_option(int argc, char *argv[])
                 break;
             case 'v' :
                 versus_mode = True;
-                ku_num = 2;
+                ku_num = 3;
                 word_num = False;
                 break;
             case 'w' :
