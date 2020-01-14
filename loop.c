@@ -71,8 +71,10 @@ void show_options(void)
     }else{
         if( ku_num > 0 ){
             // [v]
-            if( versus_mode == True ){
+            if( versus_mode == 1 ){
                 printf("first part\n");
+            }else if( versus_mode == 2 ){
+                printf("second part\n");
             }
             // [k]
             else{
@@ -252,10 +254,13 @@ void gen_idxs(int *ms, int max_idx, int num, int n)
     }
 
     // select opened position
-    if( versus_mode == True ){
-        for( i = 0; i <= 2; i++ ){
-            ms[i] = True;
-        }
+    if( versus_mode == 1 ){
+        ms[0] = True;
+        ms[1] = True;
+        ms[2] = True;
+    }else if( versus_mode == 2 ){
+        ms[3] = True;
+        ms[4] = True;
     }else{
         for( i = 0; i < num; i++ ){
             // case : all position is opened
