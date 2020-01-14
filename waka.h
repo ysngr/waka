@@ -123,8 +123,8 @@ extern int wakalist[MAX_WAKA][MAX_WORD];
 #define DEFAULT_WORD_NUM 0
 #define DEFAULT_FILENAME "waka.txt"
 
-extern int dupl, rand_ord, constant, open_index, versus_mode;
-extern int quiz_num, ku_num, word_num;
+extern int dupl, rand_ord, constant, open_index;
+extern int quiz_num, ku_num, word_num, versus_mode;
 extern char filename[MAX_BUF_SIZE];
 
 
