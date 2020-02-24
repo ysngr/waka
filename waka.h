@@ -107,55 +107,58 @@
 #define MAX_HS 70
 #define MAX_CHARNUM 5
 
+#define MODE_SHOW_ALL -1
+#define MODE_VERSUS 0
+#define MODE_KU 1
+#define MODE_WORD 2
+
 extern const char hslist[MAX_HS][MAX_CHARNUM];
 
-extern int max_waka;
 extern int wakalist[MAX_WAKA][MAX_WORD];
 
-
-#define DEFAULT_DUPLICATION False
-#define DEFAULT_RANDOM_ORDER False
-#define DEFAULT_CONSTANT False
-#define DEFAULT_OPEN_INDEX False
-#define DEFAULT_VERSUS_MODE False
-#define DEFAULT_QUIZ_NUM 5
-#define DEFAULT_KU_NUM 1
-#define DEFAULT_WORD_NUM 0
-#define DEFAULT_FILENAME "waka.txt"
-
-extern int dupl, rand_ord, constant, open_index;
-extern int quiz_num, ku_num, word_num, versus_mode;
-extern char filename[MAX_BUF_SIZE];
-
+extern int range_from, range_to, quiz_num, is_show_index;
+extern int mode;
+extern int versus_ku_fs;
+extern int opened_ku, is_const_open_place;
+extern int opened_word;
+extern int is_show_in_order, is_show_duplication;
 
 
 /* waka.c */
-void parse_option(int, char*[]);
 void init_option(void);
+void parse_option(int, char*[]);
+void error_parse_option(char);
 
 
 /* setup.c */
 void init(void);
 void init_wakalist(void);
 void scan_wakas(FILE*);
-int wtons(int, char*);
+void wtons(int, char*);
 int hton(char*, int*);
 extern void set_aryelem_int(int*, int, int);
 
 
 /* loop.c */
-void show(void);
+extern void show(void);
 void show_options(void);
-void show_nth_waka_mkus(int, int*);
-void show_nth_waka_mwords(int, int*);
 void show_nth_waka(int);
 void show_ntoh(int);
 int select_n(int, int*);
 void select_ms(int, int*);
 void gen_idxs(int*, int, int, int);
 int is_in(int, int*, int);
-int is_cmpall_int(int*, int, int);
+extern int is_cmpall_int(int*, int, int);
 void wait_for_newline(void);
+
+
+/* ku.c */
+extern void select_ms_ku(int*);
+extern void show_nth_waka_mkus(int, int*);
+
+/* word.c */
+extern void select_ms_word(int, int*);
+extern void show_nth_waka_mwords(int, int*);
 
 
 #endif

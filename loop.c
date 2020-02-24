@@ -3,42 +3,67 @@
 #include "waka.h"
 
 
-
 void show(void)
 {
     int i;
 
-    int idxlist[max_waka];  // index list of shown waka
+    int is_nth_waka_appeared[MAX_WAKA];
     int n;
     int ms[MAX_WORD];
 
-    // prologue
-    show_options();
-    wait_for_newline();
-
     // initialize
     srand((unsigned)time(NULL));
-    set_aryelem_int(idxlist, max_waka, True);
-    n = Init;
-    select_ms(Init, ms);
+    set_aryelem_int(is_nth_waka_appeared, MAX_WAKA, True);
+    n = range_from - 1;  // n will be increased (or reassigned) in function select_n
+    switch( mode ){
+        case MODE_VERSUS :
+            set_aryelem_int(ms, MAX_WORD, False);
+            switch( versus_ku_fs ){
+                case 1 :
+                    ms[0] = True;  ms[1] = True;  ms[2] = True;
+                    break;
+                case 2 :
+                    ms[3] = True;  ms[4] = True;
+                    break;
+            }
+            break;
+        case MODE_KU :
+            select_ms_ku(ms);
+            break;
+    }
 
+    // prologue
+    // show_options();  // TODO
+    wait_for_newline();
+
+    // quiz loop
     for( i = 0; i < quiz_num; i++ ){
-        // select waka and opened character
-        n = select_n(n, idxlist);
-        if( word_num > 0 || (ku_num > 0 && constant == False) ){
-            select_ms(n, ms);
+        // select index
+        n = select_n(n, is_nth_waka_appeared);
+
+        // show closed waka
+        switch( mode ){
+            case MODE_VERSUS :
+                show_nth_waka_mkus(n, ms);
+                wait_for_newline();
+                break;
+            case MODE_KU :
+                if( is_const_open_place == False ){
+                    select_ms_ku(ms);  // select ku opened
+                }
+                show_nth_waka_mkus(n, ms);
+                wait_for_newline();
+                break;
+            case MODE_WORD :
+                select_ms_word(n, ms);  // select word opened
+                show_nth_waka_mwords(n, ms);
+                wait_for_newline();
+                break;
         }
-        // show hidden waka
-        if( ku_num > 0 ){
-            show_nth_waka_mkus(n, ms);
-            wait_for_newline();
-        }else if( word_num > 0 ){
-            show_nth_waka_mwords(n, ms);
-            wait_for_newline();
-        }
+
         // show opened waka
         show_nth_waka(n);
-        if( ku_num + word_num != 0 && i != quiz_num-1 ){
+        if( mode != MODE_SHOW_ALL && i != quiz_num-1 ){
             wait_for_newline();
         }
     }
@@ -51,7 +76,8 @@ void show(void)
 }
 
 
-void show_options(void)
+/*
+void show_options(void)  // TODO
 {
     printf(" === Quiz start === \n");
     printf("[options]\n");
@@ -118,66 +144,14 @@ void show_options(void)
 
     return ;
 }
-
-
-void show_nth_waka_mkus(int n, int *mkus)
-{
-    int i;
-    int ku;
-    int ms[MAX_WORD];
-
-    // make ms array
-    set_aryelem_int(ms, MAX_WORD, False);
-    ku = 0;
-    for( i = 0; wakalist[n][i] != 0; i++ ){
-        if( wakalist[n][i] == BLANK ){
-            ms[i] = True;
-            ku++;
-        }else if( mkus[ku] == True ){
-            ms[i] = True;
-        }else{
-            ms[i] = False;
-        }
-    }
-
-    // show
-    show_nth_waka_mwords(n, ms);
-
-    return ;
-}
-
-
-void show_nth_waka_mwords(int n, int *mwords)
-{
-    int i;
-
-    if( open_index == True ){
-        printf("%3d : ", n+1);
-    }
-
-    for( i = 0; wakalist[n][i] != 0; i++ ){
-        if( mwords[i] == True ){
-            show_ntoh(wakalist[n][i]);
-        }else{
-            show_ntoh(HIDDEN);
-        }
-    }
-
-    return ;
-}
+*/
 
 
 void show_nth_waka(int n)
 {
-    int i;
-
-    if( open_index == True ){
-        printf("%3d : ", n+1);
-    }
-
-    for( i = 0; wakalist[n][i] != 0; i++ ){
-        show_ntoh(wakalist[n][i]);
-    }
+    int ms[MAX_WORD];
+    set_aryelem_int(ms, MAX_WORD, True);
+    show_nth_waka_mwords(n, ms);
     printf("\n");
 
     return ;
@@ -192,90 +166,31 @@ void show_ntoh(int charnum)
 }
 
 
-int select_n(int prev_idx, int *idxlist)
+int select_n(int prev_idx, int *is_nth_waka_appeared)
 {
     int next_idx;
 
-    if( is_cmpall_int(idxlist, max_waka, False) ){
-        set_aryelem_int(idxlist, max_waka, True);
+    // if all waka is appeared then reset
+    if( is_cmpall_int(is_nth_waka_appeared, MAX_WAKA, False) ){
+        set_aryelem_int(is_nth_waka_appeared, MAX_WAKA, True);
     }
 
-    if( rand_ord == True ){
+    if( is_show_in_order ){
+        if( (next_idx = prev_idx + 1) > range_to ){
+            next_idx = range_from;
+        }
+    }else{
         do{
-            next_idx = rand() % max_waka;
-            if( dupl == True ){
+            next_idx = (rand() % (range_to - range_from + 1)) + range_from;
+            if( is_show_duplication ){
                 break;
             }
-        }while( idxlist[next_idx] == False );
-    }else{
-        next_idx = (prev_idx + 1) % max_waka;
+        }while( is_nth_waka_appeared[next_idx] == False );
     }
 
-    idxlist[next_idx] = False;
+    is_nth_waka_appeared[next_idx] = False;
 
     return next_idx;
-}
-
-
-void select_ms(int n, int *ms)
-{
-    if( ku_num > 0 ){
-        gen_idxs(ms, MAX_KU, ku_num, False);
-        // in case ku, function gen_idxs does not use 4th parameter
-        // therefore, this 4th parameter (False) is dummy value
-    }
-
-    else if( word_num > 0 ){
-        if( n == Init ){
-            return ;
-        }
-        int max_word;
-        for( max_word = 0; wakalist[n][max_word] != 0; max_word++ );
-        gen_idxs(ms, max_word, word_num, n);
-    }
-
-    return ;
-}
-
-
-void gen_idxs(int *ms, int max_idx, int num, int n)
-{
-    int i, idx;
-
-    // initialize
-    set_aryelem_int(ms, MAX_WORD, False);
-    if( word_num > 0 ){
-        // set brank position opened
-        for( i = 0; i < max_idx; i++ ){
-            if( wakalist[n][i] == BLANK ){
-                ms[i] = True;
-            }
-        }
-    }
-
-    // select opened position
-    if( versus_mode == 1 ){
-        ms[0] = True;
-        ms[1] = True;
-        ms[2] = True;
-    }else if( versus_mode == 2 ){
-        ms[3] = True;
-        ms[4] = True;
-    }else{
-        for( i = 0; i < num; i++ ){
-            // case : all position is opened
-            if( is_cmpall_int(ms, max_idx, True) ){
-                break;
-            }
-            // select
-            do{
-                idx = rand() % max_idx;
-            }while( ms[idx] == True );
-            ms[idx] = True;
-        }
-    }
-
-    return ;
 }
 
 

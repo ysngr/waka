@@ -7,8 +7,8 @@ void init(void)
 {
     FILE *fp;
 
-    if( (fp = fopen(filename,"r")) == NULL ){
-        printf("File cannot open.\n");
+    if( (fp = fopen("waka.txt", "r")) == NULL ){
+        fprintf(stderr, "File cannot open.\n");
         exit(EXIT_FAILURE);
     }
 
@@ -25,6 +25,7 @@ void init_wakalist(void)
 {
     int i;
     for( i = 0; i < MAX_WAKA; i++ ){
+        // elements of wakalist are initialized with 0
         set_aryelem_int(wakalist[i], MAX_WORD, 0);
     }
 
@@ -34,26 +35,19 @@ void init_wakalist(void)
 
 void scan_wakas(FILE *fp)
 {
-    int idx;
     char wakabuf[MAX_BUF_SIZE];
 
-    idx = 0;
-    while( fgets(wakabuf, MAX_BUF_SIZE, fp) != NULL ){
-        if( wtons(idx, wakabuf) ){
-            idx++;
-        }
-    }
-
-    max_waka = idx;
-    if( ku_num + word_num == 0 ){
-        quiz_num = max_waka;
+    int i;
+    for( i = 0; i < MAX_WAKA; i++ ){
+        fgets(wakabuf, MAX_BUF_SIZE, fp);
+        wtons(i, wakabuf);
     }
 
     return ;
 }
 
 
-int wtons(int idx, char *waka)
+void wtons(int idx, char *waka)
 {
     int i, d, cn_idx;
     int charnum[MAX_WORD];
@@ -65,10 +59,7 @@ int wtons(int idx, char *waka)
 
     // translate
     for( i = 0, cn_idx = 0; waka[i] != '\0'; i += d ){
-        // todo commentout
-        if( (d = hton(&(waka[i]), &(charnum[cn_idx++]))) == False ){
-            return False;
-        }
+        d = hton(&(waka[i]), &(charnum[cn_idx++]));
     }
 
     // copy to wakalist
@@ -76,7 +67,7 @@ int wtons(int idx, char *waka)
         wakalist[idx][i] = charnum[i];
     }
 
-    return True;
+    return ;
 }
 
 
@@ -89,11 +80,11 @@ int hton(char *hs, int *res)
         len = strlen(hslist[i]);
         if( strncmp(hs, hslist[i], len) == 0 ){
             *res = i + 1;
-            return len;
+            break;
         }
     }
 
-    return False;
+    return len;
 }
 
 
