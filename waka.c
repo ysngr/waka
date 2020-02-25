@@ -2,34 +2,22 @@
 
 #include "waka.h"
 
-const char hslist[MAX_HS][MAX_CHARNUM] = {
-    {"あ"}, {"い"}, {"う"}, {"え"}, {"お"},  // 01 ~ 05
-    {"か"}, {"き"}, {"く"}, {"け"}, {"こ"},  // 06 ~ 10
-    {"さ"}, {"し"}, {"す"}, {"せ"}, {"そ"},  // 11 ~ 15
-    {"た"}, {"ち"}, {"つ"}, {"て"}, {"と"},  // 16 ~ 20
-    {"な"}, {"に"}, {"ぬ"}, {"ね"}, {"の"},  // 21 ~ 25
-    {"は"}, {"ひ"}, {"ふ"}, {"へ"}, {"ほ"},  // 26 ~ 30
-    {"ま"}, {"み"}, {"む"}, {"め"}, {"も"},  // 31 ~ 35
-    {"や"}, {"ゆ"}, {"よ"},  // 36 ~ 38
-    {"ら"}, {"り"}, {"る"}, {"れ"}, {"ろ"},  // 39 ~ 43
-    {"わ"}, {"ゐ"}, {"ゑ"}, {"を"}, {"ん"},  // 44 ~ 48
-    {"が"}, {"ぎ"}, {"ぐ"}, {"げ"}, {"ご"},  // 49 ~ 53
-    {"ざ"}, {"じ"}, {"ず"}, {"ぜ"}, {"ぞ"},  // 54 ~ 58
-    {"だ"}, {"ぢ"}, {"づ"}, {"で"}, {"ど"},  // 59 ~ 63
-    {"ば"}, {"び"}, {"ぶ"}, {"べ"}, {"ぼ"},  // 64 ~ 68
-    {"　"}, {"ｘ"}  // 69 ~ 70
-};
 
-
-int max_waka;
-int wakalist[MAX_WAKA][MAX_WORD];
-
-int dupl, rand_ord, constant, open_index;
-int quiz_num, ku_num, word_num, versus_mode;
-char filename[MAX_BUF_SIZE];
+int range_from, range_to, quiz_num, is_show_index;
+int mode;
+int versus_ku_fs;
+int opened_ku, is_const_open_place;
+int opened_word;
+int is_show_in_order, is_show_duplication;
 
 extern char *optarg;
 extern int optind, opterr, optopt;
+
+
+static void init_option(void);
+static void parse_option(int, char*[]);
+static void error_parse_option(char);
+static void show_usage(char*);
 
 
 
@@ -44,93 +32,170 @@ int main(int argc, char *argv[])
 }
 
 
-
-void init_option(void)
+static void init_option(void)
 {
-    dupl = DEFAULT_DUPLICATION;
-    rand_ord = DEFAULT_RANDOM_ORDER;
-    constant = DEFAULT_CONSTANT;
-    open_index = DEFAULT_OPEN_INDEX;
-    versus_mode = DEFAULT_VERSUS_MODE;
-    quiz_num = DEFAULT_QUIZ_NUM;
-    ku_num = DEFAULT_KU_NUM;
-    word_num = DEFAULT_WORD_NUM;
-    strncpy(filename, DEFAULT_FILENAME, MAX_BUF_SIZE);
+    // set default value
+
+    range_from = 0;
+    range_to = 99;
+    quiz_num = 100;
+    is_show_index = False;
+
+    mode = MODE_VERSUS;
+    versus_ku_fs = 1;
+    opened_ku = 0;
+    is_const_open_place = False;
+    opened_word = 0;
+
+    is_show_in_order = False;
+    is_show_duplication = False;
 
     return ;
 }
 
 
-void parse_option(int argc, char *argv[])
+static void parse_option(int argc, char *argv[])
 {
     int opt;
+    int is_mode_changed = False;  // mode can be changed only once from default
 
     opterr = 0;
-    while( (opt = getopt(argc, argv, "cdf:hik:n:prv:w:")) != -1 ){
+    while( (opt = getopt(argc, argv, "av:k:cw:odif:t:n:h")) != -1 ){
         switch( opt ){
-            case 'c' :
-                constant = True;
-                break;
-            case 'd' :
-                dupl = True;
-                break;
-            case 'f' :
-                strncpy(filename, optarg, MAX_BUF_SIZE);
-                break;
-            case 'i' :
-                open_index = True;
-                break;
-            case 'k' :
-                ku_num = atoi(optarg);
-                if( ku_num <= 0 || 5 <= ku_num ){
-                    fprintf(stderr, "Invalid argument of option -k.\n");
-                    exit(EXIT_FAILURE);
+            case 'a' :
+                if( is_mode_changed && mode != MODE_SHOW_ALL ){
+                    error_parse_option('a');
+                }else{
+                    is_mode_changed = True;
+                    mode = MODE_SHOW_ALL;
                 }
-                word_num = False;
-                break;
-            case 'n' :
-                if( (quiz_num = atoi(optarg)) <= 0 ){
-                    fprintf(stderr, "Invalid argument of option -n.\n");
-                    exit(EXIT_FAILURE);
-                }
-                break;
-            case 'p' :
-                ku_num = False;
-                word_num = False;
-                break;
-            case 'r' :
-                rand_ord = True;
                 break;
             case 'v' :
-                versus_mode = atoi(optarg);
-                switch( versus_mode ){
-                    case 1 :
-                        ku_num = 3;
-                        word_num = False;
-                        break;
-                    case 2 :
-                        ku_num = 2;
-                        word_num = False;
-                        break;
-                    default :
-                        fprintf(stderr, "Invalid argument of option -v\n");
-                        exit(EXIT_FAILURE);
+                versus_ku_fs = atoi(optarg);
+                if( versus_ku_fs != 1 && versus_ku_fs != 2 ){
+                    error_parse_option('v');
+                }
+                if( is_mode_changed && mode != MODE_VERSUS ){
+                    error_parse_option('v');
+                }else{
+                    is_mode_changed = True;
+                    mode = MODE_VERSUS;
+                }
+                break;
+            case 'k' :
+                opened_ku = atoi(optarg);
+                if( opened_ku <= 0 || opened_ku >= 5 ){
+                    error_parse_option('k');
+                }
+                if( is_mode_changed && mode != MODE_KU ){
+                    error_parse_option('k');
+                }else{
+                    is_mode_changed = True;
+                    mode = MODE_KU;
+                }
+                break;
+            case 'c' :
+                is_const_open_place = True;
+                if( is_mode_changed && mode != MODE_KU ){
+                    error_parse_option('c');
+                }else{
+                    is_mode_changed = True;
+                    mode = MODE_KU;
                 }
                 break;
             case 'w' :
-                if( (word_num = atoi(optarg)) <= 0 ){
-                    fprintf(stderr, "Invalid argument of option -w.\n");
-                    exit(EXIT_FAILURE);
+                if( (opened_word = atoi(optarg)) <= 0 ){
+                    error_parse_option('w');
                 }
-                ku_num = False;
+                if( is_mode_changed && mode != MODE_WORD ){
+                    error_parse_option('w');
+                }else{
+                    is_mode_changed = True;
+                    mode = MODE_WORD;
+                }
+                break;
+            case 'o' :
+                is_show_in_order = True;
+                break;
+            case 'd' :
+                is_show_duplication = True;
+                break;
+            case 'i' :
+                is_show_index = True;
+                break;
+            case 'f' :
+                range_from = atoi(optarg);
+                if( range_from <= 0 || MAX_WAKA < range_from ){
+                    error_parse_option('f');
+                }
+                range_from--;
+                break;
+            case 't' :
+                range_to = atoi(optarg);
+                if( range_to <= 0 || MAX_WAKA < range_to ){
+                    error_parse_option('t');
+                }
+                range_to--;
+                break;
+            case 'n' :
+                if( (quiz_num = atoi(optarg)) <= 0 ){
+                    error_parse_option('n');
+                }
                 break;
             case 'h' :
+                show_usage(argv[0]);
+                fprintf(stderr, "Options:\n");
+                fprintf(stderr, "  -a       : Display all waka opned.\n");
+                fprintf(stderr, "  -v <num> : Configure opened phrase. [num=1,2]\n");
+                fprintf(stderr, "  -k <num> : Configure the number of opend ku. [num=1..4]\n");
+                fprintf(stderr, "  -w <num> : Configure the number of opened words. [num=1..%d]\n", MAX_WORD);
+                fprintf(stderr, "  -o       : Display waka in order.\n");
+                fprintf(stderr, "  -d       : Permit duplicated display.\n");
+                fprintf(stderr, "  -i       : Display index of waka.\n");
+                fprintf(stderr, "  -f <num> : Configure range(start index) of waka. [num=1..100]\n");
+                fprintf(stderr, "  -t <num> : Configure range(end index) of waka. [num=1..100]\n");
+                fprintf(stderr, "  -n <num> : Configure the number of quiz. [num=1..]\n");
+                fprintf(stderr, "  -h       : Display this help.\n");
+                exit(1);
             case '?' :
             default :
-                fprintf(stderr, "Usage : %s [-d] [-f filename] [-k ku_num [-c] | -w word_num | -p | -v versus_mode] [-h] [-i] [-n quiz_num] [-r]\n", argv[0]);
+                fprintf(stderr, "Invalid commandline option '%c'.\n", optopt);
+                show_usage(argv[0]);
                 exit(EXIT_FAILURE);
         }
     }
+
+    if( range_to < range_from ){
+        int temp = range_to;
+        range_to = range_from;
+        range_from = temp;
+    }
+
+    if( mode == MODE_SHOW_ALL ){
+        quiz_num = range_to - range_from + 1;
+    }
+
+    return ;
+}
+
+
+static void error_parse_option(char c)
+{
+    fprintf(stderr, "Invalid argument of option -%c.\n", c);
+    exit(EXIT_FAILURE);
+}
+
+
+static void show_usage(char *program_name)
+{
+    int i = 0;
+
+    fprintf(stderr, "Usage: %s [-a | -v <num> | -k <num> [-c] | -w <num>] [-o | -d]\n", program_name);
+
+    for( i = 0; i < strlen("Usage: ")+strlen(program_name)+1; i++ ){
+        fprintf(stderr, " ");
+    }
+    fprintf(stderr, "[-i | -f <num> | -t <num> | -n <num>] [-h]\n");
 
     return ;
 }
