@@ -112,10 +112,8 @@
 #define MODE_KU 1
 #define MODE_WORD 2
 
-extern const char hslist[MAX_HS][MAX_CHARNUM];
 
-extern int wakalist[MAX_WAKA][MAX_WORD];
-
+/* waka.c */
 extern int range_from, range_to, quiz_num, is_show_index;
 extern int mode;
 extern int versus_ku_fs;
@@ -124,41 +122,16 @@ extern int opened_word;
 extern int is_show_in_order, is_show_duplication;
 
 
-/* waka.c */
-void init_option(void);
-void parse_option(int, char*[]);
-void error_parse_option(char);
-
-
 /* setup.c */
+extern const char hslist[MAX_HS][MAX_CHARNUM];
+extern int wakalist[MAX_WAKA][MAX_WORD];
+
 void init(void);
-void init_wakalist(void);
-void scan_wakas(FILE*);
-void wtons(int, char*);
-int hton(char*, int*);
-extern void set_aryelem_int(int*, int, int);
+void set_aryelem_int(int*, int, int);
 
 
 /* loop.c */
-extern void show(void);
-void show_options(void);
-void show_nth_waka(int);
-void show_ntoh(int);
-int select_n(int, int*);
-void select_ms(int, int*);
-void gen_idxs(int*, int, int, int);
-int is_in(int, int*, int);
-extern int is_cmpall_int(int*, int, int);
-void wait_for_newline(void);
-
-
-/* ku.c */
-extern void select_ms_ku(int*);
-extern void show_nth_waka_mkus(int, int*);
-
-/* word.c */
-extern void select_ms_word(int, int*);
-extern void show_nth_waka_mwords(int, int*);
+void show(void);
 
 
 #endif

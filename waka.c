@@ -2,27 +2,6 @@
 
 #include "waka.h"
 
-const char hslist[MAX_HS][MAX_CHARNUM] = {
-    {"あ"}, {"い"}, {"う"}, {"え"}, {"お"},  // 01 ~ 05
-    {"か"}, {"き"}, {"く"}, {"け"}, {"こ"},  // 06 ~ 10
-    {"さ"}, {"し"}, {"す"}, {"せ"}, {"そ"},  // 11 ~ 15
-    {"た"}, {"ち"}, {"つ"}, {"て"}, {"と"},  // 16 ~ 20
-    {"な"}, {"に"}, {"ぬ"}, {"ね"}, {"の"},  // 21 ~ 25
-    {"は"}, {"ひ"}, {"ふ"}, {"へ"}, {"ほ"},  // 26 ~ 30
-    {"ま"}, {"み"}, {"む"}, {"め"}, {"も"},  // 31 ~ 35
-    {"や"}, {"ゆ"}, {"よ"},  // 36 ~ 38
-    {"ら"}, {"り"}, {"る"}, {"れ"}, {"ろ"},  // 39 ~ 43
-    {"わ"}, {"ゐ"}, {"ゑ"}, {"を"}, {"ん"},  // 44 ~ 48
-    {"が"}, {"ぎ"}, {"ぐ"}, {"げ"}, {"ご"},  // 49 ~ 53
-    {"ざ"}, {"じ"}, {"ず"}, {"ぜ"}, {"ぞ"},  // 54 ~ 58
-    {"だ"}, {"ぢ"}, {"づ"}, {"で"}, {"ど"},  // 59 ~ 63
-    {"ば"}, {"び"}, {"ぶ"}, {"べ"}, {"ぼ"},  // 64 ~ 68
-    {"　"}, {"ｘ"}  // 69 ~ 70
-};
-
-
-int max_waka;
-int wakalist[MAX_WAKA][MAX_WORD];
 
 int range_from, range_to, quiz_num, is_show_index;
 int mode;
@@ -31,9 +10,13 @@ int opened_ku, is_const_open_place;
 int opened_word;
 int is_show_in_order, is_show_duplication;
 
-
 extern char *optarg;
 extern int optind, opterr, optopt;
+
+
+static void init_option(void);
+static void parse_option(int, char*[]);
+static void error_parse_option(char);
 
 
 
@@ -48,8 +31,7 @@ int main(int argc, char *argv[])
 }
 
 
-
-void init_option(void)
+static void init_option(void)
 {
     // set default value
 
@@ -71,7 +53,7 @@ void init_option(void)
 }
 
 
-void parse_option(int argc, char *argv[])
+static void parse_option(int argc, char *argv[])
 {
     int opt;
     int is_mode_changed = False;  // mode can be changed only once from default
@@ -182,7 +164,7 @@ void parse_option(int argc, char *argv[])
 }
 
 
-void error_parse_option(char c)
+static void error_parse_option(char c)
 {
     fprintf(stderr, "Invalid argument of option -%c.\n", c);
     exit(EXIT_FAILURE);

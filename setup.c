@@ -3,6 +3,34 @@
 #include"waka.h"
 
 
+const char hslist[MAX_HS][MAX_CHARNUM] = {
+    {"あ"}, {"い"}, {"う"}, {"え"}, {"お"},  // 01 ~ 05
+    {"か"}, {"き"}, {"く"}, {"け"}, {"こ"},  // 06 ~ 10
+    {"さ"}, {"し"}, {"す"}, {"せ"}, {"そ"},  // 11 ~ 15
+    {"た"}, {"ち"}, {"つ"}, {"て"}, {"と"},  // 16 ~ 20
+    {"な"}, {"に"}, {"ぬ"}, {"ね"}, {"の"},  // 21 ~ 25
+    {"は"}, {"ひ"}, {"ふ"}, {"へ"}, {"ほ"},  // 26 ~ 30
+    {"ま"}, {"み"}, {"む"}, {"め"}, {"も"},  // 31 ~ 35
+    {"や"}, {"ゆ"}, {"よ"},  // 36 ~ 38
+    {"ら"}, {"り"}, {"る"}, {"れ"}, {"ろ"},  // 39 ~ 43
+    {"わ"}, {"ゐ"}, {"ゑ"}, {"を"}, {"ん"},  // 44 ~ 48
+    {"が"}, {"ぎ"}, {"ぐ"}, {"げ"}, {"ご"},  // 49 ~ 53
+    {"ざ"}, {"じ"}, {"ず"}, {"ぜ"}, {"ぞ"},  // 54 ~ 58
+    {"だ"}, {"ぢ"}, {"づ"}, {"で"}, {"ど"},  // 59 ~ 63
+    {"ば"}, {"び"}, {"ぶ"}, {"べ"}, {"ぼ"},  // 64 ~ 68
+    {"　"}, {"ｘ"}  // 69 ~ 70
+};
+
+int wakalist[MAX_WAKA][MAX_WORD];
+
+
+static void init_wakalist(void);
+static void scan_wakas(FILE*);
+static void wtons(int, char*);
+static int hton(char*, int*);
+
+
+
 void init(void)
 {
     FILE *fp;
@@ -21,7 +49,7 @@ void init(void)
 }
 
 
-void init_wakalist(void)
+static void init_wakalist(void)
 {
     int i;
     for( i = 0; i < MAX_WAKA; i++ ){
@@ -33,7 +61,7 @@ void init_wakalist(void)
 }
 
 
-void scan_wakas(FILE *fp)
+static void scan_wakas(FILE *fp)
 {
     char wakabuf[MAX_BUF_SIZE];
 
@@ -47,7 +75,7 @@ void scan_wakas(FILE *fp)
 }
 
 
-void wtons(int idx, char *waka)
+static void wtons(int idx, char *waka)
 {
     int i, d, cn_idx;
     int charnum[MAX_WORD];
@@ -71,7 +99,7 @@ void wtons(int idx, char *waka)
 }
 
 
-int hton(char *hs, int *res)
+static int hton(char *hs, int *res)
 {
     int i;
     int len;
