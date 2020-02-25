@@ -108,7 +108,6 @@ void parse_option(int argc, char *argv[])
                     is_mode_changed = True;
                     mode = MODE_SHOW_ALL;
                 }
-                // is_show_in_order = True;
                 break;
             case 'v' :
                 versus_ku_fs = atoi(optarg);

@@ -33,7 +33,7 @@ void show(void)
     }
 
     // prologue
-    // show_options();  // TODO
+    show_options();
     wait_for_newline();
 
     // quiz loop
@@ -76,75 +76,76 @@ void show(void)
 }
 
 
-/*
-void show_options(void)  // TODO
+void show_options(void)
 {
-    printf(" === Quiz start === \n");
-    printf("[options]\n");
-    // [f]
-    printf("File = %s\n", filename);
-    // [i]
-    printf("Index : ");
-    if( open_index == True ){
-        printf("open\n");
-    }else{
-        printf("close\n");
+    printf("[Options]\n");
+
+    // mode
+    printf("Mode = ");
+    switch( mode ){
+        case MODE_SHOW_ALL : // (-a)
+            printf("all\n");
+            break;
+        case MODE_VERSUS :  // (-v)
+            printf("versus ");
+            switch( versus_ku_fs ){
+                case 1 :
+                    printf("[open = first part]\n");
+                    break;
+                case 2 :
+                    printf("[open = second part]\n");
+                    break;
+            }
+            break;
+        case MODE_KU :  // (-k)
+            printf("ku ");
+            printf("[open = %d ku, ", opened_ku);
+            // opened place (-c)
+            if( is_const_open_place ){
+                printf("opened place = constant]\n");
+            }else{
+                printf("opened place = fluctuating]\n");
+            }
+            break;
+        case MODE_WORD :  // (-w)
+            printf("word ");
+            printf("[open = %d word]\n", opened_word);
+            break;
     }
-    // [k [c] | w | p | v]
-    printf("Open ");
-    if( ku_num + word_num == 0 ){  // [p]
-        printf("all\n");
+
+    // order (-o)
+    printf("Order = ");
+    if( is_show_in_order ){
+        printf("in order\n");
     }else{
-        if( ku_num > 0 ){
-            // [v]
-            if( versus_mode == 1 ){
-                printf("first part\n");
-            }else if( versus_mode == 2 ){
-                printf("second part\n");
-            }
-            // [k]
-            else{
-                printf("%d ku\n", ku_num);
-                // [c]
-                printf("Opened place : ");
-                if( constant == True ){
-                    printf("constant\n");
-                }else{
-                    printf("unsettled\n");
-                }
-            }
-        }
-        // [w]
-        else if( word_num > 0 ){
-            printf("%d word", word_num);
-            if( word_num != 1 ){
-                printf("s");
-            }
-            printf("\n");
-        }
-        // [r]
-        printf("Order = ");
-        if( rand_ord == True ){
-            printf("random\n");
-            // [d]
-            printf("Duplication = ");
-            if( dupl == True ){
-                printf("True\n");
-            }else {
-                printf("False\n");
-            }
+        printf("random, ");
+        // duplication (-d)
+        printf("Duplication = ");
+        if( is_show_duplication ){
+            printf("True\n");
         }else{
-            printf("numerical\n");
+            printf("False\n");
         }
-        // [n]
-        printf("Quiz num = %d\n", quiz_num);
     }
+
+    // index (-i)
+    printf("Index = ");
+    if( is_show_index ){
+        printf("True\n");
+    }else{
+        printf("False\n");
+    }
+
+    // range (-f, -t)
+    printf("Range = %d - %d\n", range_from+1, range_to+1);
+
+    // quiz num (-n)
+    printf("Quiz num = %d\n", quiz_num);
 
     printf("Press enter to start...");
 
     return ;
 }
-*/
 
 
 void show_nth_waka(int n)
