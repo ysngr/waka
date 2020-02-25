@@ -97,7 +97,7 @@ static void show_options(void)
     printf("[Options]\n");
 
     // mode
-    printf("Mode = ");
+    printf("  Mode = ");
     switch( mode ){
         case MODE_SHOW_ALL : // (-a)
             printf("all\n");
@@ -130,7 +130,7 @@ static void show_options(void)
     }
 
     // order (-o)
-    printf("Order = ");
+    printf("  Order = ");
     if( is_show_in_order ){
         printf("in order\n");
     }else{
@@ -145,7 +145,7 @@ static void show_options(void)
     }
 
     // index (-i)
-    printf("Index = ");
+    printf("  Index = ");
     if( is_show_index ){
         printf("True\n");
     }else{
@@ -153,10 +153,10 @@ static void show_options(void)
     }
 
     // range (-f, -t)
-    printf("Range = %d - %d\n", range_from+1, range_to+1);
+    printf("  Range = %d - %d\n", range_from+1, range_to+1);
 
     // quiz num (-n)
-    printf("Quiz num = %d\n", quiz_num);
+    printf("  Quiz num = %d\n", quiz_num);
 
     printf("Press enter to start...");
 

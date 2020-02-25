@@ -17,6 +17,7 @@ extern int optind, opterr, optopt;
 static void init_option(void);
 static void parse_option(int, char*[]);
 static void error_parse_option(char);
+static void show_usage(char*);
 
 
 
@@ -59,30 +60,8 @@ static void parse_option(int argc, char *argv[])
     int is_mode_changed = False;  // mode can be changed only once from default
 
     opterr = 0;
-    while( (opt = getopt(argc, argv, "in:f:t:av:k:cw:odh")) != -1 ){
+    while( (opt = getopt(argc, argv, "av:k:cw:odif:t:n:h")) != -1 ){
         switch( opt ){
-            case 'i' :
-                is_show_index = True;
-                break;
-            case 'n' :
-                if( (quiz_num = atoi(optarg)) <= 0 ){
-                    error_parse_option('n');
-                }
-                break;
-            case 'f' :
-                range_from = atoi(optarg);
-                if( range_from <= 0 || MAX_WAKA < range_from ){
-                    error_parse_option('f');
-                }
-                range_from--;
-                break;
-            case 't' :
-                range_to = atoi(optarg);
-                if( range_to <= 0 || MAX_WAKA < range_to ){
-                    error_parse_option('t');
-                }
-                range_to--;
-                break;
             case 'a' :
                 if( is_mode_changed && mode != MODE_SHOW_ALL ){
                     error_parse_option('a');
@@ -141,12 +120,48 @@ static void parse_option(int argc, char *argv[])
             case 'd' :
                 is_show_duplication = True;
                 break;
+            case 'i' :
+                is_show_index = True;
+                break;
+            case 'f' :
+                range_from = atoi(optarg);
+                if( range_from <= 0 || MAX_WAKA < range_from ){
+                    error_parse_option('f');
+                }
+                range_from--;
+                break;
+            case 't' :
+                range_to = atoi(optarg);
+                if( range_to <= 0 || MAX_WAKA < range_to ){
+                    error_parse_option('t');
+                }
+                range_to--;
+                break;
+            case 'n' :
+                if( (quiz_num = atoi(optarg)) <= 0 ){
+                    error_parse_option('n');
+                }
+                break;
             case 'h' :
+                show_usage(argv[0]);
+                fprintf(stderr, "Options:\n");
+                fprintf(stderr, "  -a       : Display all waka opned.\n");
+                fprintf(stderr, "  -v <num> : Configure opened phrase. [num=1,2]\n");
+                fprintf(stderr, "  -k <num> : Configure the number of opend ku. [num=1..4]\n");
+                fprintf(stderr, "  -w <num> : Configure the number of opened words. [num=1..%d]\n", MAX_WORD);
+                fprintf(stderr, "  -o       : Display waka in order.\n");
+                fprintf(stderr, "  -d       : Permit duplicated display.\n");
+                fprintf(stderr, "  -i       : Display index of waka.\n");
+                fprintf(stderr, "  -f <num> : Configure range(start index) of waka. [num=1..100]\n");
+                fprintf(stderr, "  -t <num> : Configure range(end index) of waka. [num=1..100]\n");
+                fprintf(stderr, "  -n <num> : Configure the number of quiz. [num=1..]\n");
+                fprintf(stderr, "  -h       : Display this help.\n");
+                exit(1);
             case '?' :
             default :
-                // TODO
-                fprintf(stderr, "TODO write help.\n");
-                exit(1);
+                fprintf(stderr, "Invalid commandline option '%c'.\n", optopt);
+                show_usage(argv[0]);
+                exit(EXIT_FAILURE);
         }
     }
 
@@ -168,4 +183,19 @@ static void error_parse_option(char c)
 {
     fprintf(stderr, "Invalid argument of option -%c.\n", c);
     exit(EXIT_FAILURE);
+}
+
+
+static void show_usage(char *program_name)
+{
+    int i = 0;
+
+    fprintf(stderr, "Usage: %s [-a | -v <num> | -k <num> [-c] | -w <num>] [-o | -d]\n", program_name);
+
+    for( i = 0; i < strlen("Usage: ")+strlen(program_name)+1; i++ ){
+        fprintf(stderr, " ");
+    }
+    fprintf(stderr, "[-i | -f <num> | -t <num> | -n <num>] [-h]\n");
+
+    return ;
 }
