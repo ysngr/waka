@@ -47,6 +47,7 @@ void show(void)
             select_ms_ku(ms);
             break;
     }
+    init_screen();
 
     // prologue
     show_options();
@@ -85,8 +86,11 @@ void show(void)
     }
 
     // epilogue
-    printf("Press enter to end...");
+    print("\n");
+    print("Press enter to end...");
     wait_for_newline();
+
+    end_screen(False);
 
     return ;
 }
@@ -94,71 +98,71 @@ void show(void)
 
 static void show_options(void)
 {
-    printf("[Options]\n");
+    print("[Options]\n");
 
     // mode
-    printf("  Mode = ");
+    print("  Mode = ");
     switch( mode ){
         case MODE_SHOW_ALL : // (-a)
-            printf("all\n");
+            print("all\n");
             break;
         case MODE_VERSUS :  // (-v)
-            printf("versus ");
+            print("versus ");
             switch( versus_ku_fs ){
                 case 1 :
-                    printf("[open = first part]\n");
+                    print("[open = first part]\n");
                     break;
                 case 2 :
-                    printf("[open = second part]\n");
+                    print("[open = second part]\n");
                     break;
             }
             break;
         case MODE_KU :  // (-k)
-            printf("ku ");
-            printf("[open = %d ku, ", opened_ku);
+            print("ku ");
+            printd("[open = %d ku, ", opened_ku);
             // opened place (-c)
             if( is_const_open_place ){
-                printf("opened place = constant]\n");
+                print("opened place = constant]\n");
             }else{
-                printf("opened place = fluctuating]\n");
+                print("opened place = fluctuating]\n");
             }
             break;
         case MODE_WORD :  // (-w)
-            printf("word ");
-            printf("[open = %d word]\n", opened_word);
+            print("word ");
+            printd("[open = %d word]\n", opened_word);
             break;
     }
 
     // order (-o)
-    printf("  Order = ");
+    print("  Order = ");
     if( is_show_in_order ){
-        printf("in order\n");
+        print("in order\n");
     }else{
-        printf("random, ");
+        print("random ");
         // duplication (-d)
-        printf("Duplication = ");
+        print("Duplication = ");
         if( is_show_duplication ){
-            printf("True\n");
+            print("True\n");
         }else{
-            printf("False\n");
+            print("False\n");
         }
     }
 
     // index (-i)
-    printf("  Index = ");
+    print("  Index = ");
     if( is_show_index ){
-        printf("True\n");
+        print("True\n");
     }else{
-        printf("False\n");
+        print("False\n");
     }
 
     // range (-f, -t)
-    printf("  Range = %d - %d\n", range_from+1, range_to+1);
+    printd2("  Range = %d ~ %d\n", range_from+1, range_to+1);
 
     // quiz num (-n)
-    printf("  Quiz num = %d\n", quiz_num);
+    printd("  Quiz num = %d\n", quiz_num);
 
-    printf("Press enter to start...");
+    print("Press enter to start...\n");
 
     return ;
 }
@@ -248,7 +252,7 @@ static void show_nth_waka(int n)
     int ms[MAX_WORD];
     set_aryelem_int(ms, MAX_WORD, True);
     show_nth_waka_mwords(n, ms);
-    printf("\n");
+    print("\n");
 
     return ;
 }
@@ -286,9 +290,9 @@ static void show_nth_waka_mwords(int n, int *mwords)
     int i;
 
     if( is_show_index ){
-        printf("%03d : ", n+1);
+        printd("%03d : ", n+1);
     }else{
-        printf("--- : ");
+        print("--- : ");
     }
 
     for( i = 0; wakalist[n][i] != 0; i++ ){
@@ -305,7 +309,7 @@ static void show_nth_waka_mwords(int n, int *mwords)
 
 static void show_ntoh(int charnum)
 {
-    printf("%s", hslist[charnum-1]);
+    prints("%s", hslist[charnum-1]);
 
     return ;
 }
@@ -328,9 +332,16 @@ static void wait_for_newline(void)
 {
     char buf[MAX_BUF_SIZE];
 
-    do{
-        fgets(buf, MAX_BUF_SIZE, stdin);
-    }while( buf[0] != '\n' );
+    while( True ){
+        strnget(buf, MAX_BUF_SIZE);
+
+        if( buf[0] == '\0' ){  // enter
+            adjust_line();
+            break;
+        }else if( buf[0] == 'q' && buf[1] == '\0' ){  // quit
+            end_screen(True);
+        }
+    }
 
     return ;
 }
