@@ -1,3 +1,5 @@
+/* waka.h */
+
 #ifndef WAKA_H
 #define WAKA_H
 
@@ -7,8 +9,6 @@
 #include <ctype.h>
 #include <time.h>
 #include <unistd.h>
-#include <ncurses.h>
-#include <locale.h>
 
 
 #define True 1
@@ -135,5 +135,17 @@ void set_aryelem_int(int*, int, int);
 /* loop.c */
 void show(void);
 
+
+/* view.c */
+void init_screen(void);
+void end_screen(int);
+
+void print(const char*);
+void prints(const char*, const char*);
+void printd(const char*, const int);
+void printd2(const char*, const int, const int);
+void strnget(char*, int);
+
+void adjust_line(void);
 
 #endif
