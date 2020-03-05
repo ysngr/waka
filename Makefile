@@ -1,5 +1,5 @@
 waka : waka.o setup.o loop.o
-	gcc -o waka waka.o setup.o loop.o -Wall
+	gcc -o waka waka.o setup.o loop.o -Wall -lncursesw
 
 waka.o : waka.c
 	gcc -c waka.c -Wall

@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include <time.h>
 #include <unistd.h>
+#include <ncurses.h>
+#include <locale.h>
 
 
 #define True 1

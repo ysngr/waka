@@ -2,6 +2,11 @@
 
 #include "waka.h"
 
+#define SUB_WIN_LINE 1
+
+
+static WINDOW *main_win, *sub_win;
+
 
 static void show_options(void);
 
@@ -16,6 +21,8 @@ static void show_ntoh(int);
 
 static int is_cmpall_int(int*, int, int);
 static void wait_for_newline(void);
+
+static void init_curses(void);
 
 
 
@@ -47,6 +54,7 @@ void show(void)
             select_ms_ku(ms);
             break;
     }
+    init_curses();
 
     // prologue
     show_options();
@@ -85,8 +93,12 @@ void show(void)
     }
 
     // epilogue
-    printf("Press enter to end...");
+    // printf("Press enter to end...");
+    wprintw(main_win, "Press enter to end...\n");
+    wrefresh(main_win);
     wait_for_newline();
+
+    endwin();
 
     return ;
 }
@@ -94,71 +106,119 @@ void show(void)
 
 static void show_options(void)
 {
-    printf("[Options]\n");
+    // printf("[Options]\n");
+    wprintw(main_win, "[Options]\n");
+    wrefresh(main_win);
 
     // mode
-    printf("  Mode = ");
+    // printf("  Mode = ");
+    wprintw(main_win, "  Mode = ");
+    wrefresh(main_win);
     switch( mode ){
         case MODE_SHOW_ALL : // (-a)
-            printf("all\n");
+            // printf("all\n");
+            wprintw(main_win, "all\n");
+            wrefresh(main_win);
             break;
         case MODE_VERSUS :  // (-v)
-            printf("versus ");
+            // printf("versus ");
+            wprintw(main_win, "versus ");
+            wrefresh(main_win);
             switch( versus_ku_fs ){
                 case 1 :
-                    printf("[open = first part]\n");
+                    // printf("[open = first part]\n");
+                    wprintw(main_win, "[open = first part]\n");
+                    wrefresh(main_win);
                     break;
                 case 2 :
-                    printf("[open = second part]\n");
+                    // printf("[open = second part]\n");
+                    wprintw(main_win, "[open = second part]\n");
+                    wrefresh(main_win);
                     break;
             }
             break;
         case MODE_KU :  // (-k)
-            printf("ku ");
-            printf("[open = %d ku, ", opened_ku);
+            // printf("ku ");
+            wprintw(main_win, "ku ");
+            wrefresh(main_win);
+            // printf("[open = %d ku, ", opened_ku);
+            wprintw(main_win, "[open = %d ku, ", opened_ku);
+            wrefresh(main_win);
             // opened place (-c)
             if( is_const_open_place ){
-                printf("opened place = constant]\n");
+                // printf("opened place = constant]\n");
+                wprintw(main_win, "opened place = constant]\n");
+                wrefresh(main_win);
             }else{
-                printf("opened place = fluctuating]\n");
+                // printf("opened place = fluctuating]\n");
+                wprintw(main_win, "opened place = fluctuating]\n");
+                wrefresh(main_win);
             }
             break;
         case MODE_WORD :  // (-w)
-            printf("word ");
-            printf("[open = %d word]\n", opened_word);
+            // printf("word ");
+            wprintw(main_win, "word ");
+            wrefresh(main_win);
+            // printf("[open = %d word]\n", opened_word);
+            wprintw(main_win, "[open = %d word]\n", opened_word);
+            wrefresh(main_win);
             break;
     }
 
     // order (-o)
-    printf("  Order = ");
+    // printf("  Order = ");
+    wprintw(main_win, "  Order = ");
+    wrefresh(main_win);
     if( is_show_in_order ){
-        printf("in order\n");
+        // printf("in order\n");
+        wprintw(main_win, "in order\n");
+        wrefresh(main_win);
     }else{
-        printf("random, ");
+        // printf("random, ");
+        wprintw(main_win, "random, ");
+        wrefresh(main_win);
         // duplication (-d)
-        printf("Duplication = ");
+        // printf("Duplication = ");
+        wprintw(main_win, "Duplication = ");
+        wrefresh(main_win);
         if( is_show_duplication ){
-            printf("True\n");
+            // printf("True\n");
+            wprintw(main_win, "True\n");
+            wrefresh(main_win);
         }else{
-            printf("False\n");
+            // printf("False\n");
+            wprintw(main_win, "False\n");
+            wrefresh(main_win);
         }
     }
 
     // index (-i)
-    printf("  Index = ");
+    // printf("  Index = ");
+    wprintw(main_win, "  Index = ");
+    wrefresh(main_win);
     if( is_show_index ){
-        printf("True\n");
+        // printf("True\n");
+        wprintw(main_win, "True\n");
+        wrefresh(main_win);
     }else{
-        printf("False\n");
+        // printf("False\n");
+        wprintw(main_win, "False\n");
+        wrefresh(main_win);
     }
 
     // range (-f, -t)
-    printf("  Range = %d - %d\n", range_from+1, range_to+1);
+    // printf("  Range = %d - %d\n", range_from+1, range_to+1);
+    wprintw(main_win, "  Range = %d - %d\n", range_from+1, range_to+1);
+    wrefresh(main_win);
 
     // quiz num (-n)
-    printf("  Quiz num = %d\n", quiz_num);
+    // printf("  Quiz num = %d\n", quiz_num);
+    wprintw(main_win, "  Quiz num = %d\n", quiz_num);
+    wrefresh(main_win);
 
-    printf("Press enter to start...");
+    // printf("Press enter to start...");
+    wprintw(main_win, "Press enter to start...\n\n");
+    wrefresh(main_win);
 
     return ;
 }
@@ -248,7 +308,9 @@ static void show_nth_waka(int n)
     int ms[MAX_WORD];
     set_aryelem_int(ms, MAX_WORD, True);
     show_nth_waka_mwords(n, ms);
-    printf("\n");
+    // printf("\n");
+    wprintw(main_win, "\n");
+    wrefresh(main_win);
 
     return ;
 }
@@ -286,9 +348,13 @@ static void show_nth_waka_mwords(int n, int *mwords)
     int i;
 
     if( is_show_index ){
-        printf("%03d : ", n+1);
+        // printf("%03d : ", n+1);
+        wprintw(main_win, "%03d : ", n+1);
+        wrefresh(main_win);
     }else{
-        printf("--- : ");
+        // printf("--- : ");
+        wprintw(main_win, "--- : ");
+        wrefresh(main_win);
     }
 
     for( i = 0; wakalist[n][i] != 0; i++ ){
@@ -299,13 +365,18 @@ static void show_nth_waka_mwords(int n, int *mwords)
         }
     }
 
+    wprintw(main_win, "\n");
+    wrefresh(main_win);
+
     return ;
 }
 
 
 static void show_ntoh(int charnum)
 {
-    printf("%s", hslist[charnum-1]);
+    // printf("%s", hslist[charnum-1]);
+    wprintw(main_win, "%s", hslist[charnum-1]);
+    // wrefresh(main_win);
 
     return ;
 }
@@ -328,9 +399,46 @@ static void wait_for_newline(void)
 {
     char buf[MAX_BUF_SIZE];
 
-    do{
-        fgets(buf, MAX_BUF_SIZE, stdin);
-    }while( buf[0] != '\n' );
+    // do{
+    //     // fgets(buf, MAX_BUF_SIZE, stdin);
+    // }while( buf[0] != '\n' );
+
+    while( True ){
+        wgetnstr(sub_win, buf, MAX_BUF_SIZE);
+
+        if( buf[0] == '\0' ){  // enter
+            break;
+        }else if( buf[0] == 'q' && buf[1] == '\0' ){  // quit
+            wprintw(main_win, "\nQuit program. See you.\n");
+            wrefresh(main_win);
+            sleep(2);
+            endwin();
+            exit(1);
+        }
+    }
+
+    return ;
+}
+
+
+static void init_curses(void)
+{
+    setlocale(LC_ALL, "");
+    initscr();
+
+    main_win = newwin(LINES-SUB_WIN_LINE, COLS, 0, 0);
+    sub_win = newwin(SUB_WIN_LINE, COLS, LINES-SUB_WIN_LINE, 0);
+
+    scrollok(main_win, TRUE);
+    scrollok(sub_win, TRUE);
+
+    curs_set(False);
+
+    // title
+    wmove(main_win, 0, (int)(COLS/2)-7);
+    wprintw(main_win, "-- 小倉百人一首 -- \n\n");
+    wrefresh(main_win);
+    wrefresh(sub_win);
 
     return ;
 }
