@@ -144,18 +144,20 @@ static void parse_option(int argc, char *argv[])
                 break;
             case 'h' :
                 show_usage(argv[0]);
-                fprintf(stderr, "Options:\n");
-                fprintf(stderr, "  -a       : Display all waka opned.\n");
-                fprintf(stderr, "  -v <num> : Configure opened phrase. [num=1,2]\n");
-                fprintf(stderr, "  -k <num> : Configure the number of opend ku. [num=1..4]\n");
-                fprintf(stderr, "  -w <num> : Configure the number of opened words. [num=1..%d]\n", MAX_WORD);
+                fprintf(stderr, "\nOptions:\n");
+                fprintf(stderr, "  -a       : Display all parts of waka.\n");
+                fprintf(stderr, "  -v <num> : Configure phrase to open. [num=1,2]\n");
+                fprintf(stderr, "  -k <num> : Configure the number of ku to open. [num=1..4]\n");
+                fprintf(stderr, "  -c       : Keep the constant position of ku to open.\n");
+                fprintf(stderr, "  -w <num> : Configure the number of words to open. [num=1..%d]\n", MAX_WORD);
                 fprintf(stderr, "  -o       : Display waka in order.\n");
-                fprintf(stderr, "  -d       : Permit duplicated display.\n");
+                fprintf(stderr, "  -d       : Permit duplicate display.\n");
                 fprintf(stderr, "  -i       : Display index of waka.\n");
-                fprintf(stderr, "  -f <num> : Configure range(start index) of waka. [num=1..100]\n");
-                fprintf(stderr, "  -t <num> : Configure range(end index) of waka. [num=1..100]\n");
+                fprintf(stderr, "  -f <num> : Configure range of waka: start index. [num=1..100]\n");
+                fprintf(stderr, "  -t <num> : Configure range of waka: end index. [num=1..100]\n");
                 fprintf(stderr, "  -n <num> : Configure the number of quiz. [num=1..]\n");
                 fprintf(stderr, "  -h       : Display this help.\n");
+                fprintf(stderr, "\nDefault option settings:\n%s -v 1 -f 1 -t 100 -n 100\n", argv[0]);
                 exit(1);
             case '?' :
             default :
@@ -195,7 +197,7 @@ static void show_usage(char *program_name)
     for( i = 0; i < strlen("Usage: ")+strlen(program_name)+1; i++ ){
         fprintf(stderr, " ");
     }
-    fprintf(stderr, "[-i | -f <num> | -t <num> | -n <num>] [-h]\n");
+    fprintf(stderr, "[-i] [-f <num>] [-t <num>] [-n <num>] [-h]\n");
 
     return ;
 }
