@@ -140,12 +140,13 @@ static void show_options(void)
     }else{
         print("random ");
         // duplication (-d)
-        print("Duplication = ");
+        print("[duplication = ");
         if( is_show_duplication ){
-            print("True\n");
+            print("True");
         }else{
-            print("False\n");
+            print("False");
         }
+        print("]\n");
     }
 
     // index (-i)
